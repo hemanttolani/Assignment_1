@@ -1,0 +1,20 @@
+package com.nagarro.weekSix;
+
+
+
+public class Products{
+	String Name,gender, color, size, availability;
+	String price, ratings;
+	
+	Products(String Name, String gender, String color, 
+			String size, String price, String ratings, String availability)
+	{
+		this.Name=Name;
+		this.gender= gender;
+		this.color=color;
+		this.size=size;
+		this.price= (price);
+		this.ratings=(ratings);
+		this.availability=availability;
+	}
+}

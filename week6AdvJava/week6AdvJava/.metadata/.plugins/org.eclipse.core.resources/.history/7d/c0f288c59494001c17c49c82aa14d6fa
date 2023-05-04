@@ -1,0 +1,127 @@
+package com.nagarro.weekSix;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+
+
+public class App
+{
+String gender, sortBy, color, size;
+
+	
+	ArrayList<Products> prodList = new ArrayList<Products>();
+	
+	App(String gender, String color,String size, String sortBy)
+	{
+		this.gender=gender;
+		this.sortBy=sortBy;
+		this.color=color;
+		this.size=size;
+	}
+	public void sortByRate()
+	{
+		Collections.sort(prodList, new Comparator<Products>() {
+        	public int compare(Products p1, Products p2)
+        	{
+        		return Double.compare(p1.ratings,p2.ratings);
+        	}
+        });
+	}
+	public void sortByPrice()
+	{
+		Collections.sort(prodList, new Comparator<Products>() {
+        	public int compare(Products p1, Products p2)
+        	{
+        		return Double.compare(p1.price,p2.price);
+        	}
+        });
+	}
+	public void printList()
+	{
+		if(prodList.size()==0)
+		{
+			System.out.println("No match found.");
+		}
+		else
+		{
+			for(int len = 0;len<prodList.size();len++)
+	        {
+	        	System.out.println("Name: "+prodList.get(len).Name);
+	        	System.out.println("Gender: "+prodList.get(len).gender);
+	        	System.out.println("Size: "+prodList.get(len).size);
+	        	System.out.println("Price: "+prodList.get(len).price);
+	        	System.out.println("Ratings: "+prodList.get(len).ratings);
+	        	System.out.println("Availability: "+prodList.get(len).availability);
+	        	System.out.println("-----------------------------------------------");
+	        }
+		}
+		
+
+	}
+    public void GetData( ) throws IOException
+    {
+    	Connection con = null;
+		String url = "jdbc:mysql://127.0.0.1:3306/mydb";
+		String driver = "com.mysql.jdbc.Driver";
+		try {
+			Class.forName(driver);
+			con = DriverManager.getConnection(url , "root", "root");
+			try {
+				Statement st = con.createStatement();
+				String selectSQL="select * from Nike";
+				ResultSet res = st.executeQuery(selectSQL);
+				
+				if(color.toUpperCase().equals(res.getString("Colour").toUpperCase()) 
+		     		   && size.toUpperCase().equals(res.getString("Size").toUpperCase()) 
+		     		   && gender.toUpperCase().equals(res.getString("GENDER_RECOMMENDATION").toUpperCase())
+		     		   && res.getString("availability")=="Y")
+				{
+					while (res.next()) {
+						String id = res.getString("id");
+						String name = res.getString("name");
+						String gender = res.getString("GENDER_RECOMMENDATION");
+						String size = res.getString("size");
+						String color = res.getString("colour");
+						String price = res.getString("price");
+						String rating = res.getString("rating");
+						String availability = res.getString("availability");
+						Products p1 = new Products(id, name, gender, color, size, price, rating, availability);	
+						prodList.add(p1);
+					}	
+			}
+		} catch (SQLException s) {
+			System.out.println("SQL statement is not executed!");
+	}
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();	
+		}
+ 
+		if(sortBy.toUpperCase().equals("R"))
+		{
+			sortByRate();
+		}
+		else if(sortBy.toUpperCase().equals("P"))
+		{
+			sortByPrice();
+		}
+		else if(sortBy.toUpperCase().equals("P+R"))
+		{
+			sortByRate();
+			sortByPrice();
+		}
+		else
+		{
+			System.out.println("Invalid Preference, Showing without any sortings: ");
+		}
+	}
+	
+}
